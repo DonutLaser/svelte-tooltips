@@ -1,10 +1,15 @@
+let defaultOptions: TooltipOptions = {
+    placement: 'top',
+    offset: 0,
+    delay: 0,
+};
 let activeTooltip: HTMLElement;
 let delayTimeout: number;
 
 type TooltipPlacement = 'top' | 'right' | 'bottom' | 'left';
 
 interface TooltipOptions {
-    message: string;
+    message?: string;
     tooltipClass?: string;
     placement?: TooltipPlacement;
     offset?: number;
@@ -70,13 +75,14 @@ function onMouseEnter(event: MouseEvent, node: HTMLElement, options: TooltipOpti
         return;
     }
 
+    const finalOptions = { ...defaultOptions, ...options };
 
-    if (options.delay && options.delay > 0) {
+    if (finalOptions.delay && finalOptions.delay > 0) {
         delayTimeout = setTimeout(() => {
-            activeTooltip = createTooltip(node, options, event.pageX, event.pageY);
-        }, options.delay);
+            activeTooltip = createTooltip(node, finalOptions, event.pageX, event.pageY);
+        }, finalOptions.delay);
     } else {
-        activeTooltip = createTooltip(node, options, event.pageX, event.pageY);
+        activeTooltip = createTooltip(node, finalOptions, event.pageX, event.pageY);
     }
 }
 
@@ -108,4 +114,8 @@ export function tooltip(node: HTMLElement, options: TooltipOptions): { destroy: 
             node.removeEventListener('mouseleave', handleMouseLeave, true);
         }
     };
+}
+
+export function setGlobalTooltipOptions(options: TooltipOptions): void {
+    defaultOptions = { ...defaultOptions, ...options };
 }
